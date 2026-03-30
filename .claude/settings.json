@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sudo npm:*)",
+      "Bash(npx netlify-cli:*)",
+      "Bash(node -e \":*)",
+      "WebFetch(domain:aiassist.bg)",
+      "Bash(curl -s https://aiassist.bg)"
+    ],
+    "additionalDirectories": [
+      "/Users/radinapetrova/Desktop"
+    ]
+  }
+}

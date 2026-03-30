@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acctos AI — The Agentic AI Operating System for Accounting Firms</title>
+    <meta name="description" content="Acctos AI is an Agentic AI Operating System for accounting firms. Autonomous agents turn bank statements into ledger-ready Excel files in under 60 seconds. UK, Bulgaria & EU.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080808;
+            --bg-2: #0d0d0d;
+            --surface: #111111;
+            --surface-2: #161616;
+            --border: rgba(255,255,255,0.06);
+            --border-2: rgba(255,255,255,0.11);
+            --accent: #10b981;
+            --accent-2: #34d399;
+            --accent-dim: rgba(16,185,129,0.1);
+            --accent-glow: rgba(16,185,129,0.22);
+            --text-1: #fafafa;
+            --text-2: #a3a3a3;
+            --text-3: #525252;
+            --r: 16px;
+            --r-lg: 24px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Outfit', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text-1);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Grain overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9000;
+        }
+
+        /* Hero ambient glow */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 100vh;
+            background:
+                radial-gradient(ellipse 70% 55% at 72% 38%, rgba(16,185,129,0.055) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 60% at 20% 70%, rgba(59,130,246,0.025) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Dot grid */
+        .dot-grid {
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 28px 28px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── NAV ─────────────────────────── */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: 200;
+            padding: 22px 0;
+            transition: padding 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+            border-bottom: 1px solid transparent;
+        }
+        .nav.scrolled {
+            padding: 14px 0;
+            background: rgba(8,8,8,0.82);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-color: var(--border);
+        }
+        .nav-inner {
+            max-width: 1180px; margin: 0 auto; padding: 0 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: relative; z-index: 1;
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: var(--text-1);
+            font-weight: 700; font-size: 17px; letter-spacing: -0.025em;
+        }
+        .logo-mark {
+            width: 34px; height: 34px; flex-shrink: 0;
+        }
+        .nav-links {
+            display: flex; align-items: center; gap: 32px;
+        }
+        .nav-links a {
+            text-decoration: none; color: var(--text-2); font-size: 14px;
+            font-weight: 500; transition: color 0.2s; letter-spacing: -0.01em;
+        }
+        .nav-links a:hover { color: var(--text-1); }
+        .nav-actions { display: flex; align-items: center; gap: 10px; }
+        .btn-ghost {
+            text-decoration: none; color: var(--text-2); font-size: 14px;
+            font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: all 0.2s;
+        }
+        .btn-ghost:hover { color: var(--text-1); background: var(--surface); }
+        .btn-nav-cta {
+            text-decoration: none; background: var(--accent); color: #fff;
+            font-size: 14px; font-weight: 600; padding: 9px 20px; border-radius: 8px;
+            transition: all 0.25s; letter-spacing: -0.01em;
+        }
+        .btn-nav-cta:hover { background: var(--accent-2); transform: translateY(-1px); box-shadow: 0 6px 20px var(--accent-glow); }
+
+        /* ── HERO ────────────────────────── */
+        .hero {
+            min-height: 100dvh;
+            display: grid;
+            grid-template-columns: 55fr 45fr;
+            align-items: center;
+            max-width: 1180px; margin: 0 auto;
+            padding: 130px 40px 80px;
+            gap: 72px;
+            position: relative; z-index: 1;
+        }
+        .hero-left { display: flex; flex-direction: column; gap: 28px; }
+
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--accent-dim); border: 1px solid rgba(16,185,129,0.18);
+            color: var(--accent); font-size: 11px; font-weight: 700;
+            padding: 5px 14px; border-radius: 100px; width: fit-content;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            opacity: 0; transform: translateY(8px);
+            animation: fadeUp 0.5s ease 0.1s forwards;
+        }
+        .badge-dot {
+            width: 6px; height: 6px; background: var(--accent);
+            border-radius: 50%; animation: pulseDot 2s ease infinite;
+        }
+        @keyframes pulseDot {
+            0%,100% { opacity:1; transform:scale(1); }
+            50% { opacity:0.4; transform:scale(0.75); }
+        }
+
+        .hero-headline {
+            font-size: clamp(46px, 5.8vw, 76px);
+            font-weight: 800; line-height: 1.04; letter-spacing: -0.045em;
+            opacity: 0; transform: translateY(18px);
+            animation: fadeUp 0.65s ease 0.22s forwards;
+        }
+        .hero-headline em { font-style: normal; color: var(--accent); }
+
+        .hero-sub {
+            font-size: 18px; font-weight: 400; color: var(--text-2);
+            line-height: 1.68; max-width: 440px;
+            opacity: 0; transform: translateY(18px);
+            animation: fadeUp 0.65s ease 0.38s forwards;
+        }
+
+        .hero-actions {
+            display: flex; align-items: center; gap: 12px;
+            opacity: 0; transform: translateY(18px);
+            animation: fadeUp 0.65s ease 0.52s forwards;
+        }
+        .btn-hero-primary {
+            display: inline-flex; align-items: center; gap: 9px;
+            background: var(--accent); color: #fff; text-decoration: none;
+            font-size: 15px; font-weight: 600; padding: 14px 28px;
+            border-radius: 12px; transition: all 0.25s; letter-spacing: -0.01em;
+        }
+        .btn-hero-primary:hover { background: var(--accent-2); transform: translateY(-2px); box-shadow: 0 14px 40px var(--accent-glow); }
+        .btn-hero-secondary {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: var(--text-2); text-decoration: none;
+            font-size: 15px; font-weight: 500; padding: 14px 22px;
+            border: 1px solid var(--border); border-radius: 12px; transition: all 0.25s;
+        }
+        .btn-hero-secondary:hover { color: var(--text-1); border-color: var(--border-2); background: var(--surface); }
+
+        .hero-proof {
+            display: flex; align-items: center; gap: 14px;
+            opacity: 0; transform: translateY(18px);
+            animation: fadeUp 0.65s ease 0.66s forwards;
+        }
+        .proof-avatars { display: flex; }
+        .proof-av {
+            width: 30px; height: 30px; border-radius: 50%;
+            border: 2px solid var(--bg); margin-left: -7px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700;
+        }
+        .proof-av:first-child { margin-left: 0; }
+        .proof-av:nth-child(1) { background: #1d3557; color: #a8dadc; }
+        .proof-av:nth-child(2) { background: #2d1b4e; color: #c084fc; }
+        .proof-av:nth-child(3) { background: #1a2e1a; color: var(--accent); }
+        .proof-av:nth-child(4) { background: #2e1a1a; color: #fca5a5; }
+        .proof-text { font-size: 13px; color: var(--text-3); }
+        .proof-text strong { color: var(--text-2); font-weight: 600; }
+
+        /* ── HERO VIZ ────────────────────── */
+        .hero-right {
+            position: relative; height: 520px;
+            opacity: 0; animation: fadeIn 0.9s ease 0.45s forwards;
+        }
+        .viz-glow {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 340px; height: 340px;
+            background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 68%);
+            border-radius: 50%; pointer-events: none;
+        }
+        .viz-card {
+            position: absolute; background: rgba(17,17,17,0.92);
+            border: 1px solid var(--border-2); border-radius: var(--r);
+            padding: 18px; backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* Input card */
+        .viz-input {
+            top: 0; left: 10px; width: 276px;
+            animation: floatA 7s ease-in-out infinite;
+        }
+        @keyframes floatA {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-9px); }
+        }
+        .viz-card-hdr {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+        }
+        .viz-icon {
+            width: 34px; height: 34px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .viz-icon.red { background: rgba(239,68,68,0.15); color: #f87171; }
+        .viz-icon.green { background: var(--accent-dim); color: var(--accent); }
+        .viz-lbl { font-size: 12px; font-weight: 600; color: var(--text-2); letter-spacing: -0.01em; }
+        .viz-sub { font-size: 11px; color: var(--text-3); }
+        .viz-file {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: 10px; padding: 11px;
+        }
+        .viz-file-badge {
+            width: 30px; height: 38px; background: #ef4444;
+            border-radius: 5px; display: flex; align-items: center;
+            justify-content: center; font-size: 8px; font-weight: 800;
+            color: #fff; letter-spacing: 0.02em; flex-shrink: 0;
+        }
+        .viz-fname { font-size: 11px; font-weight: 600; color: var(--text-1); }
+        .viz-fmeta { font-size: 10px; color: var(--text-3); margin-top: 1px; }
+
+        /* Processing card */
+        .viz-proc {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 196px; text-align: center;
+            border-color: rgba(16,185,129,0.22);
+            background: rgba(16,185,129,0.04);
+            animation: floatB 7s ease-in-out 1.8s infinite;
+        }
+        @keyframes floatB {
+            0%,100% { transform: translate(-50%,-50%) translateY(0); }
+            50% { transform: translate(-50%,-50%) translateY(-9px); }
+        }
+        .viz-ai-lbl {
+            font-size: 11px; font-weight: 700; color: var(--accent);
+            letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 12px;
+        }
+        .viz-spinner {
+            width: 38px; height: 38px;
+            border: 2px solid rgba(16,185,129,0.15);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin 1.4s linear infinite; margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .viz-steps { display: flex; flex-direction: column; gap: 6px; text-align: left; }
+        .vstep { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-3); }
+        .vstep.done { color: var(--accent); }
+        .vstep.active { color: var(--text-2); }
+        .vstep-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-3); flex-shrink: 0; }
+        .vstep.done .vstep-dot { background: var(--accent); }
+        .vstep.active .vstep-dot { background: var(--accent); animation: pulseDot 1s ease infinite; }
+
+        /* Output card */
+        .viz-output {
+            bottom: 0; right: 0; width: 318px;
+            animation: floatC 7s ease-in-out 3.6s infinite;
+        }
+        @keyframes floatC {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-9px); }
+        }
+        .viz-tbl { width: 100%; border-collapse: collapse; margin-top: 4px; }
+        .viz-tbl th {
+            font-size: 9px; font-weight: 700; color: var(--text-3);
+            text-align: left; padding: 0 0 8px;
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .viz-tbl td {
+            font-size: 11px; color: var(--text-2); padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .viz-tbl tr:last-child td { border-bottom: none; }
+        .pos { color: var(--accent); font-weight: 600; }
+        .neg { color: #f87171; font-weight: 600; }
+        .vtag {
+            display: inline-block; padding: 2px 7px; border-radius: 100px;
+            font-size: 9px; font-weight: 600;
+        }
+        .vtag.inc { background: var(--accent-dim); color: var(--accent); }
+        .vtag.exp { background: rgba(239,68,68,0.1); color: #f87171; }
+
+        /* ── STATS ───────────────────────── */
+        .stats-bar {
+            border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+            background: var(--surface); position: relative; z-index: 1;
+        }
+        .stats-inner {
+            max-width: 1180px; margin: 0 auto; padding: 0 40px;
+            display: grid; grid-template-columns: repeat(4,1fr);
+        }
+        .stat {
+            padding: 44px 36px;
+            border-right: 1px solid var(--border);
+        }
+        .stat:last-child { border-right: none; }
+        .stat-num {
+            font-size: 50px; font-weight: 800; letter-spacing: -0.045em;
+            line-height: 1; margin-bottom: 8px; color: var(--text-1);
+        }
+        .stat-num .accent { color: var(--accent); }
+        .stat-desc { font-size: 13px; color: var(--text-3); line-height: 1.55; }
+
+        /* ── SECTION COMMON ──────────────── */
+        .section-lbl {
+            font-size: 11px; font-weight: 700; color: var(--accent);
+            letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 14px;
+        }
+        .section-h {
+            font-size: clamp(30px, 3.8vw, 52px); font-weight: 800;
+            line-height: 1.1; letter-spacing: -0.04em;
+        }
+        .section-sub {
+            font-size: 17px; color: var(--text-2); line-height: 1.68; max-width: 540px;
+        }
+
+        /* ── HOW IT WORKS ────────────────── */
+        .hiw { padding: 110px 40px; position: relative; z-index: 1; }
+        .hiw-hdr { text-align: center; max-width: 580px; margin: 0 auto 80px; }
+        .hiw-hdr .section-sub { margin: 16px auto 0; text-align: center; }
+        .hiw-steps {
+            max-width: 1180px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(3,1fr);
+            gap: 0; position: relative;
+        }
+        .hiw-steps::after {
+            content: '';
+            position: absolute; top: 23px;
+            left: calc(16.7% + 20px); right: calc(16.7% + 20px);
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--border-2), transparent);
+        }
+        .hiw-step { padding: 0 40px; }
+        .hiw-step:first-child { padding-left: 0; }
+        .hiw-step:last-child { padding-right: 0; }
+        .hiw-num {
+            width: 46px; height: 46px; border: 1px solid var(--border-2);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 17px; font-weight: 700; color: var(--text-3);
+            margin-bottom: 24px; background: var(--surface); position: relative; z-index: 1;
+            transition: all 0.3s ease;
+        }
+        .hiw-step:hover .hiw-num { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+        .hiw-title { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+        .hiw-desc { font-size: 14px; color: var(--text-2); line-height: 1.7; }
+
+        /* ── FEATURES BENTO ──────────────── */
+        .features { padding: 0 40px 110px; max-width: 1180px; margin: 0 auto; position: relative; z-index: 1; }
+        .features-hdr { margin-bottom: 56px; }
+        .features-hdr .section-sub { margin-top: 14px; }
+
+        .bento {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 14px;
+        }
+        .bc {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--r-lg); padding: 30px;
+            position: relative; overflow: hidden;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        .bc:hover { border-color: var(--border-2); transform: translateY(-2px); }
+        .bc::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(380px circle at var(--mx,50%) var(--my,50%), rgba(16,185,129,0.07), transparent 45%);
+            opacity: 0; transition: opacity 0.3s; pointer-events: none; border-radius: inherit;
+        }
+        .bc:hover::before { opacity: 1; }
+        .bc-1 { grid-column: span 7; }
+        .bc-2 { grid-column: span 5; }
+        .bc-3 { grid-column: span 4; }
+        .bc-4 { grid-column: span 5; }
+        .bc-5 { grid-column: span 3; }
+
+        .bc-icon {
+            width: 42px; height: 42px; border-radius: 11px;
+            background: var(--accent-dim); color: var(--accent);
+            display: flex; align-items: center; justify-content: center; margin-bottom: 18px;
+        }
+        .bc-title { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 9px; }
+        .bc-desc { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+
+        /* Card 1 speed visual */
+        .speed-vis {
+            margin-top: 22px; display: grid;
+            grid-template-columns: 1fr 56px 1fr; align-items: center; gap: 12px;
+        }
+        .sdoc {
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: 10px; padding: 11px;
+        }
+        .sdoc-hdr { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+        .sdoc-badge {
+            width: 20px; height: 25px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 7px; font-weight: 800; color: #fff; flex-shrink: 0;
+        }
+        .sdoc-badge.pdf { background: #ef4444; }
+        .sdoc-badge.xls { background: #059669; }
+        .sdoc-lbl { font-size: 10px; color: var(--text-3); }
+        .sbars { display: flex; flex-direction: column; gap: 4px; }
+        .sbar { height: 4px; background: var(--border-2); border-radius: 2px; }
+        .sbar.s { width: 55%; } .sbar.m { width: 78%; } .sbar.l { width: 100%; }
+        .sarrow { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .sarrow-line {
+            width: 38px; height: 1px;
+            background: linear-gradient(to right, transparent, var(--accent), transparent);
+            animation: shimmer 2.2s ease infinite;
+        }
+        @keyframes shimmer { 0%,100%{opacity:0.3} 50%{opacity:1} }
+        .sarrow-lbl { font-size: 10px; color: var(--accent); font-weight: 700; }
+        .srows { display: flex; flex-direction: column; gap: 4px; }
+        .srow { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 3px; }
+        .scell {
+            height: 7px; background: var(--border-2); border-radius: 2px;
+            animation: cellPop 0.4s ease both;
+        }
+        .scell:nth-child(2) { animation-delay: 0.08s; }
+        .scell:nth-child(3) { animation-delay: 0.16s; }
+        @keyframes cellPop { from{opacity:0;transform:scaleX(0);transform-origin:left} to{opacity:1;transform:scaleX(1)} }
+
+        /* Card 2 accuracy ring */
+        .acc-vis { margin-top: 22px; display: flex; align-items: center; gap: 18px; }
+        .acc-ring { position: relative; width: 82px; height: 82px; flex-shrink: 0; }
+        .acc-ring svg { transform: rotate(-90deg); }
+        .ring-bg { fill: none; stroke: var(--border-2); stroke-width: 4; }
+        .ring-fill {
+            fill: none; stroke: var(--accent); stroke-width: 4;
+            stroke-linecap: round; stroke-dasharray: 226; stroke-dashoffset: 11;
+        }
+        .acc-num {
+            position: absolute; inset: 0; display: flex; align-items: center;
+            justify-content: center; font-size: 15px; font-weight: 800;
+        }
+        .acc-label { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .acc-sub { font-size: 12px; color: var(--text-3); line-height: 1.55; }
+
+        /* Card 5 language */
+        .lang-vis { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+        .lang-item {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: 9px; padding: 10px 13px; font-size: 13px; color: var(--text-2);
+        }
+        .lang-flag { font-size: 18px; line-height: 1; }
+        .lang-name { font-weight: 600; color: var(--text-1); flex: 1; }
+        .lang-tag {
+            font-size: 10px; color: var(--accent); background: var(--accent-dim);
+            padding: 2px 9px; border-radius: 100px; font-weight: 600;
+        }
+
+        /* ── PRICING ─────────────────────── */
+        .pricing {
+            padding: 110px 40px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            position: relative; z-index: 1;
+        }
+        .pricing-inner { max-width: 1180px; margin: 0 auto; }
+        .pricing-hdr { text-align: center; max-width: 540px; margin: 0 auto 64px; }
+        .pricing-hdr .section-sub { margin: 14px auto 0; text-align: center; }
+
+        .pricing-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 18px; align-items: start;
+        }
+        .pc {
+            background: var(--bg-2); border: 1px solid var(--border);
+            border-radius: var(--r-lg); padding: 34px;
+            position: relative; transition: all 0.3s;
+        }
+        .pc:hover { border-color: var(--border-2); transform: translateY(-4px); }
+        .pc.featured {
+            background: linear-gradient(145deg, rgba(16,185,129,0.07) 0%, var(--bg-2) 100%);
+            border-color: rgba(16,185,129,0.28);
+        }
+        .pc.featured:hover {
+            border-color: rgba(16,185,129,0.48);
+            box-shadow: 0 28px 80px rgba(16,185,129,0.08);
+        }
+        .pc-badge {
+            display: inline-block; background: var(--accent); color: #fff;
+            font-size: 11px; font-weight: 700; padding: 4px 13px; border-radius: 100px;
+            letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 14px;
+        }
+        .pc-plan {
+            font-size: 12px; font-weight: 700; color: var(--text-3);
+            letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 10px;
+        }
+        .pc-price { display: flex; align-items: baseline; gap: 3px; margin-bottom: 5px; }
+        .pc-curr { font-size: 22px; font-weight: 700; color: var(--text-2); }
+        .pc-amt {
+            font-size: 54px; font-weight: 800; letter-spacing: -0.045em;
+            color: var(--text-1); line-height: 1;
+        }
+        .pc-period { font-size: 13px; color: var(--text-3); margin-bottom: 7px; }
+        .pc-desc {
+            font-size: 13px; color: var(--text-3);
+            margin-bottom: 26px; padding-bottom: 26px; border-bottom: 1px solid var(--border);
+            line-height: 1.6;
+        }
+        .pc-feats { list-style: none; display: flex; flex-direction: column; gap: 11px; margin-bottom: 30px; }
+        .pc-feat { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: var(--text-2); }
+        .pc-check {
+            width: 17px; height: 17px; border-radius: 5px; background: var(--accent-dim);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 1px; color: var(--accent);
+        }
+        .pc-cta {
+            display: block; text-align: center; text-decoration: none;
+            padding: 12px 22px; border-radius: 10px; font-size: 14px; font-weight: 600;
+            transition: all 0.25s; letter-spacing: -0.01em;
+        }
+        .pc-cta.outline { border: 1px solid var(--border-2); color: var(--text-2); }
+        .pc-cta.outline:hover { background: var(--surface); color: var(--text-1); border-color: var(--text-3); }
+        .pc-cta.filled { background: var(--accent); color: #fff; }
+        .pc-cta.filled:hover { background: var(--accent-2); transform: translateY(-1px); box-shadow: 0 8px 26px var(--accent-glow); }
+
+        /* ── TRUST / SECURITY ────────────── */
+        .trust { padding: 110px 40px; max-width: 1180px; margin: 0 auto; position: relative; z-index: 1; }
+        .trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: stretch; }
+        .trust-content { display: flex; flex-direction: column; gap: 28px; }
+        .trust-hdr-copy { font-size: 14px; color: var(--text-3); line-height: 1.65; margin-top: 4px; max-width: 380px; }
+
+        /* 2×3 security card grid */
+        .trust-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .trust-card {
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: var(--r); padding: 18px 16px;
+            transition: border-color 0.28s, transform 0.25s, box-shadow 0.28s;
+            position: relative; overflow: hidden; cursor: default;
+        }
+        .trust-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(to right, transparent, rgba(16,185,129,0.55), transparent);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .trust-card:hover { border-color: rgba(16,185,129,0.3); transform: translateY(-3px); box-shadow: 0 10px 32px rgba(16,185,129,0.08); }
+        .trust-card:hover::before { opacity: 1; }
+        .trust-card:hover .tc-ic { background: var(--accent-dim); border-color: rgba(16,185,129,0.3); color: var(--accent-2); }
+        .tc-ic {
+            width: 34px; height: 34px; border-radius: 9px;
+            background: var(--surface); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent); margin-bottom: 11px; transition: all 0.28s;
+        }
+        .tc-ttl { font-size: 12px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
+        .tc-dsc { font-size: 11px; color: var(--text-2); line-height: 1.6; }
+
+        /* Audit log panel */
+        .trust-viz {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--r-lg); overflow: hidden;
+            display: flex; flex-direction: column; height: 100%;
+        }
+        .tv-hdr {
+            padding: 16px 22px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+        }
+        .tv-dots { display: flex; gap: 6px; }
+        .tvd { width: 10px; height: 10px; border-radius: 50%; opacity: 0.7; }
+        .tvd.r { background: #ef4444; } .tvd.y { background: #f59e0b; } .tvd.g { background: #10b981; }
+        .tv-title { font-size: 12px; color: var(--text-3); font-weight: 500; margin-left: 6px; }
+        .tv-log { padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .log-entry {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 7px 8px; border-radius: 7px;
+            transition: background 0.18s;
+            opacity: 0; animation: logIn 0.4s ease forwards;
+        }
+        .log-entry:hover { background: rgba(255,255,255,0.04); }
+        @keyframes logIn { to { opacity: 1; } }
+        .tv-log .log-entry:nth-child(1) { animation-delay: 0.1s; }
+        .tv-log .log-entry:nth-child(2) { animation-delay: 0.22s; }
+        .tv-log .log-entry:nth-child(3) { animation-delay: 0.34s; }
+        .tv-log .log-entry:nth-child(4) { animation-delay: 0.46s; }
+        .tv-log .log-entry:nth-child(5) { animation-delay: 0.58s; }
+        .tv-log .log-entry:nth-child(6) { animation-delay: 0.70s; }
+        .tv-log .log-entry:nth-child(7) { animation-delay: 0.82s; }
+        .tv-log .log-entry:nth-child(8) { animation-delay: 0.94s; }
+        .tv-log .log-entry:nth-child(9) { animation-delay: 1.06s; }
+        .log-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+        .log-dot.ok { background: var(--accent); }
+        .log-dot.ok.pulse { animation: pulseDot 2s ease infinite; }
+        .log-dot.warn { background: #f59e0b; }
+        .log-action { font-size: 11.5px; font-weight: 500; color: var(--text-2); }
+        .log-meta { font-size: 10.5px; color: var(--text-3); margin-top: 1px; }
+
+        /* Status bar + metrics */
+        .tv-status {
+            padding: 11px 22px; border-top: 1px solid var(--border);
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(16,185,129,0.04); flex-shrink: 0;
+        }
+        .tv-status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulseDot 2s ease infinite; flex-shrink: 0; }
+        .tv-status-txt { font-size: 11px; font-weight: 600; color: var(--accent); }
+        .tv-status-time { font-size: 11px; color: var(--text-3); margin-left: auto; }
+        .tv-metrics {
+            padding: 14px 16px; border-top: 1px solid var(--border);
+            display: grid; grid-template-columns: 1fr 1fr 1fr; flex-shrink: 0;
+        }
+        .tv-metric { text-align: center; padding: 0 6px; }
+        .tv-metric + .tv-metric { border-left: 1px solid var(--border); }
+        .tv-metric-val { font-size: 18px; font-weight: 800; color: var(--text-1); letter-spacing: -0.04em; line-height: 1; margin-bottom: 3px; }
+        .tv-metric-val .acc { color: var(--accent); }
+        .tv-metric-lbl { font-size: 10px; color: var(--text-3); letter-spacing: 0.04em; text-transform: uppercase; }
+
+        /* ── BUILT BY AIASSIST.BG ────────── */
+        .built-by {
+            padding: 110px 40px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            position: relative; z-index: 1;
+        }
+        .built-by-inner { max-width: 1180px; margin: 0 auto; }
+        .built-by-top { text-align: center; margin-bottom: 56px; }
+        .built-by-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            border: 1px solid var(--border-2); color: var(--text-3);
+            font-size: 11px; font-weight: 700; padding: 6px 18px;
+            border-radius: 100px; letter-spacing: 0.07em; text-transform: uppercase;
+            margin-bottom: 26px;
+        }
+        .built-by-h {
+            font-size: clamp(34px, 4.6vw, 58px); font-weight: 800;
+            letter-spacing: -0.04em; line-height: 1.08; margin-bottom: 14px;
+        }
+        .built-by-h .accent { color: var(--accent); }
+        .built-by-sub {
+            font-size: 17px; color: var(--text-2); line-height: 1.68;
+            max-width: 580px; margin: 0 auto;
+        }
+        .built-by-card {
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: var(--r-lg); padding: 40px 44px;
+            margin-bottom: 18px;
+            display: grid; grid-template-columns: 1fr 240px;
+            gap: 56px; align-items: center;
+            transition: border-color 0.3s;
+        }
+        .built-by-card:hover { border-color: var(--border-2); }
+        .built-by-copy { font-size: 15px; color: var(--text-2); line-height: 1.78; }
+        .built-by-copy p + p { margin-top: 12px; }
+
+        /* AIAssist company card */
+        .aiassist-card {
+            display: flex; flex-direction: column; align-items: center; gap: 18px;
+            padding: 28px 24px; text-align: center;
+            background: var(--bg); border: 1px solid var(--border-2);
+            border-radius: var(--r-lg);
+            transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative; overflow: hidden; flex-shrink: 0;
+        }
+        .aiassist-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(16,185,129,0.07), transparent 65%);
+            opacity: 0; transition: opacity 0.35s;
+        }
+        .aiassist-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 16px 48px var(--accent-glow); }
+        .aiassist-card:hover::before { opacity: 1; }
+        .aiassist-logo-img {
+            width: 140px; height: auto; display: block;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+            transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .aiassist-card:hover .aiassist-logo-img { transform: scale(1.04); }
+        .aiassist-tagline {
+            font-size: 12px; color: var(--text-3); line-height: 1.55;
+            letter-spacing: 0.01em;
+        }
+        .btn-learn {
+            display: inline-flex; align-items: center; gap: 9px;
+            background: var(--surface); border: 1px solid var(--border-2);
+            color: var(--text-1); text-decoration: none;
+            font-size: 13px; font-weight: 600; padding: 10px 20px;
+            border-radius: 8px; transition: all 0.25s; white-space: nowrap;
+            position: relative; z-index: 1;
+        }
+        .btn-learn svg { transition: transform 0.25s; }
+        .btn-learn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); box-shadow: 0 4px 16px var(--accent-glow); }
+        .btn-learn:hover svg { transform: translate(2px, -2px); }
+        .built-by-tiles {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+        }
+        .bb-tile {
+            background: var(--bg-2); border: 1px solid var(--border);
+            border-radius: var(--r); padding: 24px 20px;
+            transition: all 0.28s; position: relative; overflow: hidden;
+        }
+        .bb-tile::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(16,185,129,0.06), transparent 50%);
+            opacity: 0; transition: opacity 0.3s; pointer-events: none; border-radius: inherit;
+        }
+        .bb-tile:hover { border-color: var(--border-2); transform: translateY(-3px); background: var(--surface); }
+        .bb-tile:hover::before { opacity: 1; }
+        .bb-icon {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: var(--accent-dim); color: var(--accent);
+            display: flex; align-items: center; justify-content: center; margin-bottom: 14px;
+        }
+        .bb-h { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 6px; }
+        .bb-d { font-size: 12px; color: var(--text-3); line-height: 1.6; }
+
+        /* ── CTA ─────────────────────────── */
+        .cta-sec { padding: 130px 40px; text-align: center; position: relative; z-index: 1; }
+        .cta-inner { max-width: 680px; margin: 0 auto; }
+        .cta-h {
+            font-size: clamp(38px, 5.2vw, 66px); font-weight: 800;
+            letter-spacing: -0.045em; line-height: 1.05; margin-bottom: 22px;
+        }
+        .cta-sub { font-size: 17px; color: var(--text-2); margin-bottom: 48px; line-height: 1.68; }
+        .cta-actions { display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .btn-cta {
+            display: inline-flex; align-items: center; gap: 8px;
+            text-decoration: none; padding: 15px 34px; border-radius: 12px;
+            font-size: 15px; font-weight: 600; letter-spacing: -0.01em; transition: all 0.25s;
+        }
+        .btn-cta.primary { background: var(--accent); color: #fff; }
+        .btn-cta.primary:hover { background: var(--accent-2); transform: translateY(-2px); box-shadow: 0 20px 56px var(--accent-glow); }
+        .btn-cta.secondary { border: 1px solid var(--border-2); color: var(--text-2); }
+        .btn-cta.secondary:hover { background: var(--surface); color: var(--text-1); }
+
+        /* ── FOOTER ──────────────────────── */
+        .footer { border-top: 1px solid var(--border); padding: 64px 40px; position: relative; z-index: 1; }
+        .footer-inner {
+            max-width: 1180px; margin: 0 auto;
+            display: grid; grid-template-columns: 2.2fr 1fr 1fr 1fr; gap: 56px;
+        }
+        .footer-logo {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: var(--text-1);
+            font-weight: 700; font-size: 17px; letter-spacing: -0.025em; margin-bottom: 14px;
+        }
+        .footer-tag { font-size: 13px; color: var(--text-3); line-height: 1.65; max-width: 270px; }
+        .footer-col-h {
+            font-size: 12px; font-weight: 700; color: var(--text-3);
+            letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px;
+        }
+        .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .footer-links a { text-decoration: none; font-size: 13px; color: var(--text-3); transition: color 0.2s; }
+        .footer-links a:hover { color: var(--text-1); }
+        .footer-btm {
+            max-width: 1180px; margin: 40px auto 0; padding-top: 28px;
+            border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .footer-copy { font-size: 12px; color: var(--text-3); }
+        .footer-legal { display: flex; gap: 22px; }
+        .footer-legal a { font-size: 12px; color: var(--text-3); text-decoration: none; transition: color 0.2s; }
+        .footer-legal a:hover { color: var(--text-2); }
+
+        /* ── ANIMATIONS ──────────────────── */
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        .reveal {
+            opacity: 0; transform: translateY(22px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .reveal.on { opacity: 1; transform: translateY(0); }
+        .d1 { transition-delay: 0.1s; }
+        .d2 { transition-delay: 0.2s; }
+        .d3 { transition-delay: 0.3s; }
+        .d4 { transition-delay: 0.4s; }
+
+        /* ── RESPONSIVE ──────────────────── */
+        @media (max-width: 1024px) {
+            .hero { grid-template-columns: 1fr; gap: 56px; min-height: auto; padding-top: 140px; }
+            .hero-right { height: 420px; }
+            .stats-inner { grid-template-columns: repeat(2,1fr); }
+            .stat:nth-child(2) { border-right: none; }
+            .stat:nth-child(3) { border-bottom: none; }
+            .hiw-steps { grid-template-columns: 1fr; gap: 44px; }
+            .hiw-steps::after { display: none; }
+            .hiw-step { padding: 0; }
+            .bento { grid-template-columns: repeat(6,1fr); }
+            .bc-1,.bc-2 { grid-column: span 6; }
+            .bc-3,.bc-4 { grid-column: span 3; }
+            .bc-5 { grid-column: span 6; }
+            .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+            .trust-grid { grid-template-columns: 1fr; gap: 48px; }
+            .trust-viz { height: auto; }
+            .built-by-card { grid-template-columns: 1fr; gap: 28px; }
+            .built-by-tiles { grid-template-columns: 1fr 1fr; }
+            .footer-inner { grid-template-columns: 1fr 1fr; gap: 40px; }
+        }
+        @media (max-width: 640px) {
+            .nav-links { display: none; }
+            .nav-inner, .hiw, .features, .pricing, .trust, .built-by, .cta-sec, .footer { padding-left: 20px; padding-right: 20px; }
+            .stats-inner { padding: 0 20px; grid-template-columns: 1fr 1fr; }
+            .stat { padding: 28px 16px; }
+            .stat-num { font-size: 36px; }
+            .bento { grid-template-columns: 1fr; }
+            .bc-1,.bc-2,.bc-3,.bc-4,.bc-5 { grid-column: span 1; }
+            .cta-actions { flex-direction: column; width: 100%; }
+            .btn-cta { justify-content: center; }
+            .footer-inner { grid-template-columns: 1fr; gap: 36px; }
+            .footer-btm { flex-direction: column; gap: 14px; }
+            .built-by-tiles { grid-template-columns: 1fr; }
+            .trust-cards { grid-template-columns: 1fr; }
+            .hero { padding: 120px 20px 60px; }
+            .speed-vis { grid-template-columns: 1fr; gap: 8px; }
+            .sarrow { flex-direction: row; justify-content: center; }
+            .sarrow-line { width: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dot-grid"></div>
+
+<!-- ── NAV ──────────────────────────── -->
+<nav class="nav" id="nav">
+    <div class="nav-inner">
+        <a href="#" class="nav-logo">
+            <svg class="logo-mark" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="lbg" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#047857"/>
+                </linearGradient>
+                <filter id="lg"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <filter id="ng"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <rect width="200" height="200" rx="44" fill="url(#lbg)"/>
+              <rect x="1" y="1" width="198" height="198" rx="43" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" fill="none"/>
+              <line x1="100" y1="44" x2="46" y2="148" stroke="rgba(255,255,255,0.6)" stroke-width="5" stroke-linecap="round" filter="url(#lg)"/>
+              <line x1="100" y1="44" x2="154" y2="148" stroke="rgba(255,255,255,0.6)" stroke-width="5" stroke-linecap="round" filter="url(#lg)"/>
+              <line x1="64" y1="112" x2="136" y2="112" stroke="rgba(255,255,255,0.5)" stroke-width="4" stroke-linecap="round" filter="url(#lg)"/>
+              <line x1="64" y1="112" x2="46" y2="148" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="136" y1="112" x2="154" y2="148" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="100" cy="44" r="10" fill="white" filter="url(#ng)"/><circle cx="100" cy="44" r="5.5" fill="white"/>
+              <circle cx="46" cy="148" r="9" fill="white" filter="url(#ng)"/><circle cx="46" cy="148" r="5" fill="white"/>
+              <circle cx="154" cy="148" r="9" fill="white" filter="url(#ng)"/><circle cx="154" cy="148" r="5" fill="white"/>
+              <circle cx="64" cy="112" r="6.5" fill="rgba(255,255,255,0.92)" filter="url(#ng)"/><circle cx="64" cy="112" r="3.5" fill="white"/>
+              <circle cx="136" cy="112" r="6.5" fill="rgba(255,255,255,0.92)" filter="url(#ng)"/><circle cx="136" cy="112" r="3.5" fill="white"/>
+            </svg>
+            Acctos AI
+        </a>
+        <nav class="nav-links">
+            <a href="#how-it-works">How it works</a>
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#security">Security</a>
+            <a href="#about">About</a>
+        </nav>
+        <div class="nav-actions">
+            <a href="#" class="btn-ghost">Sign in</a>
+            <a href="https://link.empathysalesgroup.com/widget/bookings/actos_demo_call" target="_blank" rel="noopener noreferrer" class="btn-nav-cta">Book a demo</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────── -->
+<section class="hero" id="demo">
+    <div class="hero-left">
+        <div class="hero-badge">
+            <div class="badge-dot"></div>
+            Agentic AI Operating System
+        </div>
+        <h1 class="hero-headline">
+            The Agentic AI<br>
+            <em>Operating System</em><br>
+            for accountants.
+        </h1>
+        <p class="hero-sub">
+            Acctos AI is an autonomous AI Operating System built for accounting firms. Intelligent agents orchestrate your entire bank statement workflow — from inbox to ledger-ready Excel — with zero manual intervention, in under 60 seconds.
+        </p>
+        <div class="hero-actions">
+            <a href="https://link.empathysalesgroup.com/widget/bookings/actos_demo_call" target="_blank" rel="noopener noreferrer" class="btn-hero-primary">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                Watch live demo
+            </a>
+            <a href="#pricing" class="btn-hero-secondary">
+                View pricing
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+        <div class="hero-proof">
+            <div class="proof-avatars">
+                <div class="proof-av">KP</div>
+                <div class="proof-av">SR</div>
+                <div class="proof-av">MV</div>
+                <div class="proof-av">AL</div>
+            </div>
+            <p class="proof-text"><strong>47 accounting firms</strong> across UK, Bulgaria &amp; EU</p>
+        </div>
+    </div>
+
+    <div class="hero-right">
+        <div class="viz-glow"></div>
+
+        <!-- PDF input card -->
+        <div class="viz-card viz-input">
+            <div class="viz-card-hdr">
+                <div class="viz-icon red">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div>
+                    <div class="viz-lbl">Statement received</div>
+                    <div class="viz-sub">via email · just now</div>
+                </div>
+            </div>
+            <div class="viz-file">
+                <div class="viz-file-badge">PDF</div>
+                <div>
+                    <div class="viz-fname">Barclays_Nov_2025.pdf</div>
+                    <div class="viz-fmeta">2.4 MB · 12 pages</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing card -->
+        <div class="viz-card viz-proc">
+            <div class="viz-ai-lbl">Agentic OS · Active</div>
+            <div class="viz-spinner"></div>
+            <div class="viz-steps">
+                <div class="vstep done">
+                    <div class="vstep-dot"></div>Injection scan passed
+                </div>
+                <div class="vstep done">
+                    <div class="vstep-dot"></div>Extracting transactions
+                </div>
+                <div class="vstep active">
+                    <div class="vstep-dot"></div>Validation gates running
+                </div>
+                <div class="vstep">
+                    <div class="vstep-dot"></div>Formatting output
+                </div>
+            </div>
+        </div>
+
+        <!-- Output card -->
+        <div class="viz-card viz-output">
+            <div class="viz-card-hdr">
+                <div class="viz-icon green">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                </div>
+                <div>
+                    <div class="viz-lbl">Output ready · 47s</div>
+                    <div class="viz-sub">Barclays_Nov_2025.xlsx</div>
+                </div>
+            </div>
+            <table class="viz-tbl">
+                <thead>
+                    <tr>
+                        <th>Date</th><th>Description</th><th>Amount</th><th>Tag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>01/11</td>
+                        <td>HMRC VAT Payment</td>
+                        <td class="neg">−£4,200</td>
+                        <td><span class="vtag exp">Tax</span></td>
+                    </tr>
+                    <tr>
+                        <td>03/11</td>
+                        <td>Client Invoice 4821</td>
+                        <td class="pos">+£8,500</td>
+                        <td><span class="vtag inc">Income</span></td>
+                    </tr>
+                    <tr>
+                        <td>07/11</td>
+                        <td>Office Rent Nov</td>
+                        <td class="neg">−£2,100</td>
+                        <td><span class="vtag exp">Rent</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ── STATS BAR ─────────────────────── -->
+<div class="stats-bar">
+    <div class="stats-inner">
+        <div class="stat reveal">
+            <div class="stat-num"><span class="counter" data-target="90">0</span><span class="accent">%</span></div>
+            <div class="stat-desc">reduction in statement processing time</div>
+        </div>
+        <div class="stat reveal d1">
+            <div class="stat-num"><span class="counter" data-target="95">0</span><span class="accent">%+</span></div>
+            <div class="stat-desc">accuracy across standard bank formats</div>
+        </div>
+        <div class="stat reveal d2">
+            <div class="stat-num"><span class="accent">&lt;</span><span class="counter" data-target="60">0</span><span class="accent">s</span></div>
+            <div class="stat-desc">from PDF upload to structured Excel</div>
+        </div>
+        <div class="stat reveal d3">
+            <div class="stat-num"><span class="counter" data-target="15">0</span><span class="accent">+</span></div>
+            <div class="stat-desc">hours reclaimed per firm, per week</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── HOW IT WORKS ──────────────────── -->
+<section class="hiw" id="how-it-works">
+    <div class="hiw-hdr reveal">
+        <div class="section-lbl">How it works</div>
+        <h2 class="section-h">Autonomous from inbox<br>to ledger</h2>
+        <p class="section-sub">No bots to configure. No templates to maintain. Your agentic OS handles every step — you just receive clean, structured data.</p>
+    </div>
+    <div class="hiw-steps">
+        <div class="hiw-step reveal">
+            <div class="hiw-num">1</div>
+            <h3 class="hiw-title">Your client sends a PDF</h3>
+            <p class="hiw-desc">Clients email bank statements to your dedicated processing address. The agentic OS detects the document, validates it, and begins orchestration instantly — no portal logins, no manual triggers.</p>
+        </div>
+        <div class="hiw-step reveal d1">
+            <div class="hiw-num">2</div>
+            <h3 class="hiw-title">Agents extract, validate & categorise</h3>
+            <p class="hiw-desc">Specialised AI agents read every transaction, parse dates and amounts, and categorise each entry against your chart of accounts — completed autonomously in under 60 seconds with 95%+ accuracy and built-in quality gates.</p>
+        </div>
+        <div class="hiw-step reveal d2">
+            <div class="hiw-num">3</div>
+            <h3 class="hiw-title">Structured Excel, zero manual effort</h3>
+            <p class="hiw-desc">A ledger-ready Excel file appears in your Acctos AI dashboard. The OS can push it downstream into your bookkeeping software, notify your team, or trigger further agentic workflows — automatically.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ── FEATURES BENTO ────────────────── -->
+<section class="features" id="features">
+    <div class="features-hdr reveal">
+        <div class="section-lbl">Features</div>
+        <h2 class="section-h">An autonomous OS,<br>not just another AI tool</h2>
+        <p class="section-sub">Acctos AI orchestrates a network of intelligent agents that handle your accounting workflows end-to-end — not a single-point tool, but a complete agentic operating layer built for accounting firms.</p>
+    </div>
+    <div class="bento">
+
+        <!-- Card 1: Speed -->
+        <div class="bc bc-1 reveal">
+            <div class="bc-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <h3 class="bc-title">Under 60 seconds, every time</h3>
+            <p class="bc-desc">What used to take 20 minutes per statement now takes 20 seconds. Your team processes 3× the volume without adding headcount.</p>
+            <div class="speed-vis">
+                <div class="sdoc">
+                    <div class="sdoc-hdr">
+                        <div class="sdoc-badge pdf">PDF</div>
+                        <span class="sdoc-lbl">Statement.pdf</span>
+                    </div>
+                    <div class="sbars">
+                        <div class="sbar l"></div><div class="sbar m"></div>
+                        <div class="sbar s"></div><div class="sbar l"></div>
+                    </div>
+                </div>
+                <div class="sarrow">
+                    <div class="sarrow-line"></div>
+                    <div class="sarrow-lbl">&lt;60s</div>
+                    <div class="sarrow-line"></div>
+                </div>
+                <div class="sdoc">
+                    <div class="sdoc-hdr">
+                        <div class="sdoc-badge xls">XLS</div>
+                        <span class="sdoc-lbl">Output.xlsx</span>
+                    </div>
+                    <div class="srows">
+                        <div class="srow"><div class="scell"></div><div class="scell"></div><div class="scell"></div></div>
+                        <div class="srow"><div class="scell"></div><div class="scell"></div><div class="scell"></div></div>
+                        <div class="srow"><div class="scell"></div><div class="scell"></div><div class="scell"></div></div>
+                        <div class="srow"><div class="scell"></div><div class="scell"></div><div class="scell"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Accuracy -->
+        <div class="bc bc-2 reveal d1">
+            <div class="bc-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3 class="bc-title">95%+ accuracy, auditable</h3>
+            <p class="bc-desc">Consistently above 95% across standard UK and EU bank statement formats. Every extraction is logged and reviewable.</p>
+            <div class="acc-vis">
+                <div class="acc-ring">
+                    <svg width="82" height="82" viewBox="0 0 82 82">
+                        <circle class="ring-bg" cx="41" cy="41" r="36"/>
+                        <circle class="ring-fill" cx="41" cy="41" r="36"/>
+                    </svg>
+                    <div class="acc-num">95%</div>
+                </div>
+                <div>
+                    <div class="acc-label">Extraction accuracy</div>
+                    <div class="acc-sub">Barclays, HSBC, Lloyds,<br>NatWest, Santander &amp; more</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Auto-categorisation -->
+        <div class="bc bc-3 reveal">
+            <div class="bc-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            </div>
+            <h3 class="bc-title">Auto-categorisation</h3>
+            <p class="bc-desc">Every transaction is labelled — income, expenses, transfers, tax payments — mapped to your chart of accounts before it reaches you.</p>
+        </div>
+
+        <!-- Card 4: Autonomous Workflow Engine -->
+        <div class="bc bc-4 reveal d1">
+            <div class="bc-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="6" height="6" rx="1"/><rect x="16" y="3" width="6" height="6" rx="1"/><rect x="2" y="15" width="6" height="6" rx="1"/><path d="M5 9v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"/><line x1="19" y1="15" x2="19" y2="21"/><line x1="16" y1="18" x2="22" y2="18"/></svg>
+            </div>
+            <h3 class="bc-title">Autonomous workflow engine</h3>
+            <p class="bc-desc">Acctos AI's agentic workflow engine activates the moment a statement lands in your inbox — no manual triggers, no portals. Intelligent agents pause automatically at your usage limit and resume the instant you top up, keeping every workflow uninterrupted.</p>
+        </div>
+
+        <!-- Card 5: Bilingual -->
+        <div class="bc bc-5 reveal d2">
+            <div class="bc-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <h3 class="bc-title">EN &amp; BG</h3>
+            <p class="bc-desc">Full bilingual support from day one.</p>
+            <div class="lang-vis">
+                <div class="lang-item">
+                    <span class="lang-flag">🇬🇧</span>
+                    <span class="lang-name">English</span>
+                    <span class="lang-tag">Live</span>
+                </div>
+                <div class="lang-item">
+                    <span class="lang-flag">🇧🇬</span>
+                    <span class="lang-name">Bulgarian</span>
+                    <span class="lang-tag">Live</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ── PRICING ───────────────────────── -->
+<section class="pricing" id="pricing">
+    <div class="pricing-inner">
+        <div class="pricing-hdr reveal">
+            <div class="section-lbl">Pricing</div>
+            <h2 class="section-h">Start processing today.<br>Cancel any time.</h2>
+            <p class="section-sub">All plans include unlimited users, full audit logging, bilingual support, and on-demand add-on capacity.</p>
+        </div>
+        <div class="pricing-grid">
+
+            <!-- Starter -->
+            <div class="pc reveal">
+                <div class="pc-plan">Starter</div>
+                <div class="pc-price">
+                    <span class="pc-curr">£</span>
+                    <span class="pc-amt">249</span>
+                </div>
+                <div class="pc-period">per month</div>
+                <div class="pc-desc">For smaller practices processing up to 100 statements a month.</div>
+                <ul class="pc-feats">
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>1,000 PDF pages / month</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>1,000 Excel rows / month</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Acctos AI dashboard</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Email support</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>On-demand capacity top-ups</li>
+                </ul>
+                <a href="#" class="pc-cta outline">Get started</a>
+            </div>
+
+            <!-- Professional -->
+            <div class="pc featured reveal d1">
+                <div class="pc-badge">Most popular</div>
+                <div class="pc-plan">Professional</div>
+                <div class="pc-price">
+                    <span class="pc-curr">£</span>
+                    <span class="pc-amt">997</span>
+                </div>
+                <div class="pc-period">per month</div>
+                <div class="pc-desc">5× the capacity. The right fit for established practices ready to scale with agentic automation.</div>
+                <ul class="pc-feats">
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>5,000 PDF pages / month</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>5,000 Excel rows / month</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Priority support</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Autonomous workflow engine</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Auto-pause &amp; resume workflows</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Full audit trail</li>
+                </ul>
+                <a href="#" class="pc-cta filled">Get started</a>
+            </div>
+
+            <!-- Enterprise -->
+            <div class="pc reveal d2">
+                <div class="pc-plan">Enterprise</div>
+                <div class="pc-price">
+                    <span class="pc-curr">£</span>
+                    <span class="pc-amt">2,249</span>
+                </div>
+                <div class="pc-period">per month</div>
+                <div class="pc-desc">For high-volume operations and outsourcing firms. Best value per statement at scale.</div>
+                <ul class="pc-feats">
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>15,000 PDF pages / month</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>15,000 Excel rows / month</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Dedicated onboarding</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>SLA commitments</li>
+                    <li class="pc-feat"><div class="pc-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Everything in Professional</li>
+                </ul>
+                <a href="#" class="pc-cta outline">Talk to us</a>
+            </div>
+
+        </div>
+        <p style="text-align:center;margin-top:28px;font-size:12px;color:var(--text-3)">
+            Run busy? Buy additional pages or rows with one click from inside the dashboard — no plan changes, no phone calls.
+        </p>
+    </div>
+</section>
+
+<!-- ── SECURITY ──────────────────────── -->
+<section class="trust" id="security">
+    <div class="trust-grid">
+
+        <!-- Left: header + 2×3 card grid -->
+        <div class="trust-content">
+            <div>
+                <div class="section-lbl reveal">Security &amp; compliance</div>
+                <h2 class="section-h reveal" style="margin-bottom:10px">Your clients' data<br>handled with care</h2>
+                <p class="trust-hdr-copy reveal">Enterprise-grade protection at every layer — from document ingestion through agent communication to final output delivery.</p>
+            </div>
+            <div class="trust-cards">
+
+                <div class="trust-card reveal">
+                    <div class="tc-ic">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div class="tc-ttl">Azure infrastructure</div>
+                    <div class="tc-dsc">Same enterprise cloud as the Big 4. UK &amp; EU data residency available.</div>
+                </div>
+
+                <div class="trust-card reveal d1">
+                    <div class="tc-ic">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <div class="tc-ttl">End-to-end encryption</div>
+                    <div class="tc-dsc">AES-256 at rest · TLS 1.3 in transit. Bank-grade protection throughout.</div>
+                </div>
+
+                <div class="trust-card reveal d1">
+                    <div class="tc-ic">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    </div>
+                    <div class="tc-ttl">Validation gates</div>
+                    <div class="tc-dsc">Every agent output is verified for completeness and accuracy before delivery.</div>
+                </div>
+
+                <div class="trust-card reveal d2">
+                    <div class="tc-ic">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </div>
+                    <div class="tc-ttl">Injection protection</div>
+                    <div class="tc-dsc">Dedicated screening layer blocks prompt injection before any document reaches AI agents.</div>
+                </div>
+
+                <div class="trust-card reveal d2">
+                    <div class="tc-ic">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 17h6M17 14v6"/></svg>
+                    </div>
+                    <div class="tc-ttl">A2A &amp; MCP security</div>
+                    <div class="tc-dsc">Zero-trust agent communication via A2A protocol. All MCP connections scoped and auditable.</div>
+                </div>
+
+                <div class="trust-card reveal d3">
+                    <div class="tc-ic">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 12 8 8 11 16 13 6 16 12 19 8 21 14"/></svg>
+                    </div>
+                    <div class="tc-ttl">Auto-delete &amp; audit trail</div>
+                    <div class="tc-dsc">Source files deleted within 24 hrs. Every event logged for full compliance traceability.</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Right: live audit log panel -->
+        <div class="trust-viz reveal d1">
+            <div class="tv-hdr">
+                <div class="tv-dots">
+                    <div class="tvd r"></div><div class="tvd y"></div><div class="tvd g"></div>
+                </div>
+                <span class="tv-title">Security &amp; audit log — live</span>
+            </div>
+            <div class="tv-log">
+                <div class="log-entry">
+                    <div class="log-dot ok pulse"></div>
+                    <div>
+                        <div class="log-action">Injection scan passed — Barclays_Nov.pdf</div>
+                        <div class="log-meta">Today · 14:31 · No payloads detected</div>
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-dot ok"></div>
+                    <div>
+                        <div class="log-action">Statement processed — Barclays_Nov.pdf</div>
+                        <div class="log-meta">Today · 14:32 · Kingsford &amp; Partners LLP</div>
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-dot ok"></div>
+                    <div>
+                        <div class="log-action">Validation gates passed — 47/47 rows</div>
+                        <div class="log-meta">Today · 14:32 · All fields verified before delivery</div>
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-dot ok"></div>
+                    <div>
+                        <div class="log-action">Output delivered — Barclays_Nov.xlsx</div>
+                        <div class="log-meta">Today · 14:32 · AES-256 encrypted · TLS 1.3</div>
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-dot ok"></div>
+                    <div>
+                        <div class="log-action">Source file deleted automatically</div>
+                        <div class="log-meta">Today · 14:32 · GDPR · zero residual storage</div>
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-dot ok"></div>
+                    <div>
+                        <div class="log-action">A2A agent handoff authenticated</div>
+                        <div class="log-meta">Today · 14:32 · Scoped token · MCP verified</div>
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-dot ok"></div>
+                    <div>
+                        <div class="log-action">Statement processed — Lloyds_Oct.pdf</div>
+                        <div class="log-meta">Today · 11:15 · Sterling Accounts Ltd</div>
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-dot warn"></div>
+                    <div>
+                        <div class="log-action">Usage at 80% of monthly limit</div>
+                        <div class="log-meta">Today · 09:47 · Notification sent to admin</div>
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-dot ok"></div>
+                    <div>
+                        <div class="log-action">Add-on purchased — 1,000 pages</div>
+                        <div class="log-meta">Today · 09:49 · Workflows resumed automatically</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tv-status">
+                <div class="tv-status-dot"></div>
+                <span class="tv-status-txt">All systems secure &amp; operational</span>
+                <span class="tv-status-time">Updated just now</span>
+            </div>
+            <div class="tv-metrics">
+                <div class="tv-metric">
+                    <div class="tv-metric-val">47<span class="acc">+</span></div>
+                    <div class="tv-metric-lbl">Scans today</div>
+                </div>
+                <div class="tv-metric">
+                    <div class="tv-metric-val"><span class="acc">0</span></div>
+                    <div class="tv-metric-lbl">Threats blocked</div>
+                </div>
+                <div class="tv-metric">
+                    <div class="tv-metric-val">100<span class="acc">%</span></div>
+                    <div class="tv-metric-lbl">Uptime SLA</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ── BUILT BY AIASSIST.BG ─────────── -->
+<section class="built-by" id="about">
+    <div class="built-by-inner">
+
+        <div class="built-by-top reveal">
+            <div class="built-by-pill">Who is behind Acctos AI?</div>
+            <h2 class="built-by-h">Built by <span class="accent">AIAssist.bg</span></h2>
+            <p class="built-by-sub">A European AI technology company specialised in building cutting-edge agentic systems and intelligent platforms for businesses worldwide.</p>
+        </div>
+
+        <div class="built-by-card reveal">
+            <div class="built-by-copy">
+                <p>Acctos AI is the result of a deep collaboration between AIAssist.bg's AI Consulting and AI Development teams — combining technical expertise in agentic architectures, LLM orchestration, and autonomous workflow design with real-world accounting practice knowledge.</p>
+                <p>We partnered closely with accounting firms across the United Kingdom to gain the industry expertise, workflow insights, and iterative feedback that shape every feature in the platform. Their day-to-day challenges are the blueprint for what Acctos AI solves — and their ongoing input drives every release forward.</p>
+                <p>The team at AIAssist.bg is continuously expanding Acctos AI's capabilities, making the platform progressively more powerful and valuable for our clients and trusted partners. Acctos AI is one of the leading products within AIAssist.bg's rapidly growing portfolio — a portfolio that now spans from Los Angeles, California, through London, UK, and all the way to Riyadh, Saudi Arabia.</p>
+            </div>
+            <div class="aiassist-card">
+                <img src="aiassist-logo.png" alt="AIAssist.bg — AI Technology Company" class="aiassist-logo-img">
+                <p class="aiassist-tagline">European AI technology company building cutting-edge agentic systems for businesses worldwide.</p>
+                <a href="https://aiassist.bg" target="_blank" rel="noopener noreferrer" class="btn-learn">
+                    Visit AIAssist.bg
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+            </div>
+        </div>
+
+        <div class="built-by-tiles">
+
+            <div class="bb-tile reveal">
+                <div class="bb-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <div class="bb-h">AI Consulting &amp; Development</div>
+                <div class="bb-d">Multidisciplinary teams of AI consultants and engineers designing agentic systems built to scale.</div>
+            </div>
+
+            <div class="bb-tile reveal d1">
+                <div class="bb-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div class="bb-h">Deep Industry Partnership</div>
+                <div class="bb-d">Built with UK accounting firms from day one — real workflows, real data, real feedback shaping every feature.</div>
+            </div>
+
+            <div class="bb-tile reveal d2">
+                <div class="bb-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div class="bb-h">Continuously Expanding</div>
+                <div class="bb-d">New Acctos AI capabilities ship regularly — every update adds value for clients and trusted partners.</div>
+            </div>
+
+            <div class="bb-tile reveal d3">
+                <div class="bb-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div class="bb-h">Global Product Portfolio</div>
+                <div class="bb-d">AIAssist.bg's AI products are deployed across three continents — from Los Angeles to London to Riyadh.</div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ── CTA ───────────────────────────── -->
+<section class="cta-sec" id="contact">
+    <div class="cta-inner reveal">
+        <h2 class="cta-h">Ready to reclaim<br>your team's time?</h2>
+        <p class="cta-sub">Book a 30-minute demo. Bring one of your own bank statements. Watch it get processed live, in under 60 seconds — with your own data.</p>
+        <div class="cta-actions">
+            <a href="https://link.empathysalesgroup.com/widget/bookings/actos_demo_call" target="_blank" rel="noopener noreferrer" class="btn-cta primary">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Book a demo
+            </a>
+            <a href="https://link.empathysalesgroup.com/widget/bookings/actos_demo_call" target="_blank" rel="noopener noreferrer" class="btn-cta secondary">
+                Talk to the team
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────── -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div>
+            <a href="#" class="footer-logo">
+                <svg class="logo-mark" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="lbg2" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#047857"/>
+                </linearGradient>
+                <filter id="lg2"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <filter id="ng2"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <rect width="200" height="200" rx="44" fill="url(#lbg2)"/>
+              <rect x="1" y="1" width="198" height="198" rx="43" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" fill="none"/>
+              <line x1="100" y1="44" x2="46" y2="148" stroke="rgba(255,255,255,0.6)" stroke-width="5" stroke-linecap="round" filter="url(#lg2)"/>
+              <line x1="100" y1="44" x2="154" y2="148" stroke="rgba(255,255,255,0.6)" stroke-width="5" stroke-linecap="round" filter="url(#lg2)"/>
+              <line x1="64" y1="112" x2="136" y2="112" stroke="rgba(255,255,255,0.5)" stroke-width="4" stroke-linecap="round" filter="url(#lg2)"/>
+              <line x1="64" y1="112" x2="46" y2="148" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="136" y1="112" x2="154" y2="148" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="100" cy="44" r="10" fill="white" filter="url(#ng2)"/><circle cx="100" cy="44" r="5.5" fill="white"/>
+              <circle cx="46" cy="148" r="9" fill="white" filter="url(#ng2)"/><circle cx="46" cy="148" r="5" fill="white"/>
+              <circle cx="154" cy="148" r="9" fill="white" filter="url(#ng2)"/><circle cx="154" cy="148" r="5" fill="white"/>
+              <circle cx="64" cy="112" r="6.5" fill="rgba(255,255,255,0.92)" filter="url(#ng2)"/><circle cx="64" cy="112" r="3.5" fill="white"/>
+              <circle cx="136" cy="112" r="6.5" fill="rgba(255,255,255,0.92)" filter="url(#ng2)"/><circle cx="136" cy="112" r="3.5" fill="white"/>
+            </svg>
+                Acctos AI
+            </a>
+            <p class="footer-tag">The Agentic AI Operating System for accounting firms. Purpose-built for the UK, Bulgaria, and EU.</p>
+        </div>
+        <div>
+            <div class="footer-col-h">Product</div>
+            <ul class="footer-links">
+                <li><a href="#">Features</a></li>
+                <li><a href="#">Pricing</a></li>
+                <li><a href="#">How it works</a></li>
+                <li><a href="#">Integrations</a></li>
+            </ul>
+        </div>
+        <div>
+            <div class="footer-col-h">Company</div>
+            <ul class="footer-links">
+                <li><a href="#">About</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </div>
+        <div>
+            <div class="footer-col-h">Legal</div>
+            <ul class="footer-links">
+                <li><a href="#">Privacy policy</a></li>
+                <li><a href="#">Terms of service</a></li>
+                <li><a href="#">Data handling</a></li>
+                <li><a href="#">Security</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-btm">
+        <span class="footer-copy">© 2026 Acctos AI · AI Assist BG Ltd. All rights reserved.</span>
+        <div class="footer-legal">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">Cookies</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Nav scroll behaviour
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 16);
+    }, { passive: true });
+
+    // Scroll reveal
+    const ro = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -32px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+    // Counter animation
+    function runCounter(el, target) {
+        const t0 = performance.now();
+        const dur = 1600;
+        const tick = t => {
+            const p = Math.min((t - t0) / dur, 1);
+            const e = 1 - Math.pow(1 - p, 3);
+            el.textContent = Math.floor(e * target);
+            if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+    }
+    const co = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                runCounter(e.target, +e.target.dataset.target);
+                co.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.6 });
+    document.querySelectorAll('.counter').forEach(el => co.observe(el));
+
+    // Bento spotlight
+    document.querySelectorAll('.bc, .bb-tile').forEach(card => {
+        card.addEventListener('mousemove', ev => {
+            const r = card.getBoundingClientRect();
+            card.style.setProperty('--mx', ((ev.clientX - r.left) / r.width * 100) + '%');
+            card.style.setProperty('--my', ((ev.clientY - r.top) / r.height * 100) + '%');
+        });
+    });
+
+    // Processing card step animation
+    const vsteps = document.querySelectorAll('.vstep');
+    let cur = 2;
+    function nextStep() {
+        vsteps.forEach((s, i) => {
+            s.classList.toggle('done', i < cur);
+            s.classList.toggle('active', i === cur);
+        });
+        cur++;
+        if (cur >= vsteps.length) {
+            setTimeout(() => {
+                vsteps.forEach(s => s.classList.remove('done', 'active'));
+                cur = 0;
+                setTimeout(nextStep, 600);
+            }, 1400);
+        } else {
+            setTimeout(nextStep, 900);
+        }
+    }
+    setTimeout(nextStep, 1800);
+</script>
+</body>
+</html>
